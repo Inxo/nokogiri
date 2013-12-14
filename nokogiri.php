@@ -72,15 +72,15 @@ class nokogiri implements IteratorAggregate{
 		$dom->preserveWhiteSpace = false;
 		if (strlen($htmlString)){
 			libxml_use_internal_errors(true);
-			$doc->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
+			$dom->loadHTML('<?xml encoding="UTF-8">'.$htmlString);
 			// dirty fix
-			foreach ($doc->childNodes as $item){
+			foreach ($dom->childNodes as $item){
 			    if ($item->nodeType == XML_PI_NODE){
-			        $doc->removeChild($item); // remove hack
+			        $dom->removeChild($item); // remove hack
 			        break;
 			    }
 			}
-			$doc->encoding = 'UTF-8'; // insert proper
+			$dom->encoding = 'UTF-8'; // insert proper
 			libxml_clear_errors();
 		}
 		$this->loadDom($dom);
@@ -165,6 +165,8 @@ class nokogiri implements IteratorAggregate{
 							$brackets[] = '(position() -1) mod 2 = 0 and position() >= 1';
 						}elseif('even' === $e){
 							$brackets[] = 'position() mod 2 = 0 and position() >= 0';
+						}elseif(preg_match("/^[0-9]+$/", $e)){
+							$brackets[] = 'position() = '.$e;
 						}elseif(preg_match("/^((?P<mul>[0-9]+)n\+)(?P<pos>[0-9]+)$/is", $e, $esubs)){
 							if (isset($esubs['mul'])){
 								$brackets[] = '(position() -'.$esubs['pos'].') mod '.$esubs['mul'].' = 0 and position() >= '.$esubs['pos'].'';
